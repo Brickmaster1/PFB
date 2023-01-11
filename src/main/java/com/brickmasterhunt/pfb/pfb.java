@@ -1,7 +1,7 @@
 package com.brickmasterhunt.pfb;
 
 import com.brickmasterhunt.pfb.entity.RegisterEntities;
-import com.brickmasterhunt.pfb.entity.render.TestFallingBlockRenderer;
+import com.brickmasterhunt.pfb.entity.render.PhysicsFallingBlockRenderer;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.world.entity.EntityType;
@@ -89,7 +89,9 @@ public class pfb {
 
         @SubscribeEvent
         public static void onInitializeClient(FMLClientSetupEvent event) {
-            EntityRenderers.register(RegisterEntities.TEST_FALLING_BLOCK.get(), TestFallingBlockRenderer::new);
+            EntityRenderers.register(RegisterEntities.FALLING_BLOCK.get(), PhysicsFallingBlockRenderer::new);
+            EntityRenderers.register(RegisterEntities.FALLING_BLOCK_BUT_MINI_LOL.get(), PhysicsFallingBlockRenderer::new);
+            EntityRenderers.register(RegisterEntities.DAMN_THAT_BLOCK_IS_BIG.get(), PhysicsFallingBlockRenderer::new);
         }
     }
 }

@@ -164,7 +164,7 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
-    implementation fg.deobf('dev.lazurite:rayon-forge:1.6.1')
+    implementation fg.deobf('dev.lazurite:rayon-forge:1.5.9')
 }
 
 // Example for how to get properties into the manifest for reading at runtime.

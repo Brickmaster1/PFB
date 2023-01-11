@@ -1,7 +1,9 @@
 package com.brickmasterhunt.pfb.entity.render;
 
-import com.brickmasterhunt.pfb.entity.TestFallingBlockEntity;
+import com.brickmasterhunt.pfb.entity.PhysicsFallingBlockEntity;
+import com.jme3.math.Quaternion;
 import com.mojang.blaze3d.vertex.PoseStack;
+import dev.lazurite.rayon.impl.bullet.math.Convert;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -18,22 +20,24 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Random;
 
-public class TestFallingBlockRenderer extends EntityRenderer<TestFallingBlockEntity> {
+public class PhysicsFallingBlockRenderer extends EntityRenderer<PhysicsFallingBlockEntity> {
 
-    public TestFallingBlockRenderer(EntityRendererProvider.Context dispatcher) {
+    public PhysicsFallingBlockRenderer(EntityRendererProvider.Context dispatcher) {
         super(dispatcher);
         this.shadowRadius = 0.5F;
     }
 
-    public void render(TestFallingBlockEntity fallingBlockEntity, float f, float g, PoseStack poseStack, MultiBufferSource multiBufferSource, int i) {
+    public void render(PhysicsFallingBlockEntity fallingBlockEntity, float f, float g, PoseStack poseStack, MultiBufferSource multiBufferSource, int i) {
         BlockState blockState = fallingBlockEntity.getBlockState();
 
         if(blockState.getRenderShape() == RenderShape.MODEL) {
             Level level = fallingBlockEntity.getLevel();
+            com.mojang.math.Quaternion rot = Convert.toMinecraft(fallingBlockEntity.getPhysicsRotation(new Quaternion(), g));
             if (blockState != level.getBlockState(fallingBlockEntity.blockPosition()) && blockState.getRenderShape() != RenderShape.INVISIBLE) {
                 poseStack.pushPose();
                 BlockPos blockPos = new BlockPos(fallingBlockEntity.getX(), fallingBlockEntity.getBoundingBox().maxY, fallingBlockEntity.getZ());
-                poseStack.translate(-0.5D, 0.0D, -0.5D);
+                poseStack.mulPose(rot);
+                poseStack.translate(-0.5D, -0.5D, -0.5D);
                 BlockRenderDispatcher blockRenderDispatcher = Minecraft.getInstance().getBlockRenderer();
                 for (net.minecraft.client.renderer.RenderType type : net.minecraft.client.renderer.RenderType.chunkBufferLayers()) {
                     if (ItemBlockRenderTypes.canRenderInLayer(blockState, type)) {
@@ -48,8 +52,7 @@ public class TestFallingBlockRenderer extends EntityRenderer<TestFallingBlockEnt
         }
     }
 
-    @Override
-    public ResourceLocation getTextureLocation(TestFallingBlockEntity entity) {
+    public ResourceLocation getTextureLocation(PhysicsFallingBlockEntity entity) {
         return TextureAtlas.LOCATION_BLOCKS;
     }
 }
