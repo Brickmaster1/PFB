@@ -1,6 +1,7 @@
 package com.brickmasterhunt.pfb.entity;
 
 import com.jme3.bounding.BoundingBox;
+import com.jme3.math.Vector3f;
 import com.mojang.logging.LogUtils;
 import dev.lazurite.rayon.api.EntityPhysicsElement;
 import dev.lazurite.rayon.impl.bullet.collision.body.EntityRigidBody;
@@ -74,6 +75,10 @@ public class PhysicsFallingBlockEntity extends FallingBlockEntity implements Ent
         this.yo = y;
         this.zo = z;
         this.setStartPos(this.blockPosition());
+    }
+
+    public void getVelocity() {
+        getRigidBody().getLinearVelocity(new Vector3f());
     }
 
     public static PhysicsFallingBlockEntity fall(Level level, BlockPos blockPos, BlockState blockState) {

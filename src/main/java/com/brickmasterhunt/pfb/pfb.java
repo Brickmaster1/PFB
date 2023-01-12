@@ -1,13 +1,23 @@
 package com.brickmasterhunt.pfb;
 
+import com.brickmasterhunt.pfb.entity.PhysicsFallingBlockEntity;
 import com.brickmasterhunt.pfb.entity.RegisterEntities;
 import com.brickmasterhunt.pfb.entity.render.PhysicsFallingBlockRenderer;
+import com.jme3.math.Vector3f;
 import com.mojang.logging.LogUtils;
+import dev.lazurite.rayon.api.PhysicsElement;
+import dev.lazurite.rayon.api.event.collision.ElementCollisionEvents;
+import dev.lazurite.rayon.impl.bullet.collision.body.TerrainRigidBody;
 import net.minecraft.client.renderer.entity.EntityRenderers;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.commands.SummonCommand;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.FallingBlockEntity;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
@@ -43,6 +53,8 @@ public class pfb {
         // Register the processIMC method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::processIMC);
 
+        pfb.initialize();
+
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
     }
@@ -66,6 +78,25 @@ public class pfb {
         LOGGER.info("Got IMC {}", event.getIMCStream().
                 map(m -> m.messageSupplier().get()).
                 collect(Collectors.toList()));
+    }
+
+    public static void initialize() {
+        LOGGER.info("Initializing PFB");
+        ElementCollisionEvents.BLOCK_COLLISION.register(pfb::onCollision);
+    }
+
+    public static void onCollision(PhysicsElement element, TerrainRigidBody terrain, float impulse) {
+        if (element instanceof PhysicsFallingBlockEntity physicsFallingBlockEntity) {
+
+            if (terrain.getBlockState().getBlock().equals(Blocks.BRICKS)) {
+                System.out.println("Collided with bricks!");
+                PhysicsFallingBlockEntity newEntity = RegisterEntities.FALLING_BLOCK.get().create(physicsFallingBlockEntity.getLevel());
+                Vector3f elementVelocity = element.getRigidBody().getLinearVelocity(new Vector3f());
+                Vector3f negVel = elementVelocity.multLocal(-1,-1,-1);
+                newEntity.getRigidBody().setLinearVelocity(negVel);
+                physicsFallingBlockEntity.getLevel().addFreshEntity(newEntity);
+            }
+        }
     }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
